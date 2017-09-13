@@ -1,18 +1,27 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Post, Category
 import markdown
+from django.views.generic import ListView
 
 from comment.forms import CommentsForm
 
 # Create your views here.
-def index(request):
-    # return HttpResponse("<h1>yang is happy</h1>")
-    post1 = Post.objects.all()
-    context = {
-        'title': "yang & blog",
-        'post_list': post1,
-    }
-    return render(request, "blog/index.html", context)
+# def index(request):
+#     # return HttpResponse("<h1>yang is happy</h1>")
+#     post1 = Post.objects.all()
+#     context = {
+#         'title': "yang & blog",
+#         'post_list': post1,
+#     }
+#     return render(request, "blog/index.html", context)
+
+class IndexView(ListView):
+    # MVT
+    model = Post    # model指定模型类名
+    template_name = 'blog/index.html'   # 指定视图渲染的模板
+    # Post.objects.all()
+    context_object_name = 'post_list' # 这个name不能瞎取，必须和模板中的值一样
+
 
 def detail(request, pk):
     post = get_object_or_404(Post, pk=pk)

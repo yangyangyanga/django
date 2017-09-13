@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+from markdown import Markdown
+from django.utils.html import strip_tags
 
 # Create your models here.
 class Category(models.Model):
@@ -35,9 +37,19 @@ class Post(models.Model):
 
     class Meta:
         ordering = ['-created_time','-modified_time']
-
-    def __str__(self):
-        return self.title
     def get_absolute_url(self):
         # 使用reverse，生成一个完整的URL
         return reverse('blog:detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        if not self.excerpt:
+            md = Markdown(extensions=[
+                'markdown.extensions.extra',
+                'markdown.extensions.codehilite',
+            ])
+            # strip_tags去掉标签只获得文本
+            self.excerpt = strip_tags(md.convert(self.body))[:32]
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
