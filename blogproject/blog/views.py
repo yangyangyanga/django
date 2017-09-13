@@ -17,29 +17,30 @@ from comment.forms import CommentsForm
 
 class IndexView(ListView):
     # MVT
-    model = Post    # model指定模型类名
+    model = Post    # model指定要获取的模型
     template_name = 'blog/index.html'   # 指定视图渲染的模板
     # Post.objects.all()
+    # 指定获取的模型列表数据保存的变量名，这个变量会被传递给模板
     context_object_name = 'post_list' # 这个name不能瞎取，必须和模板中的值一样
 
 
-def detail(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    post.increase_views()
-    # category = post.category.name
-    post.body = markdown.markdown(post.body,
-                    extensions=[
-                        'markdown.extensions.extra',
-                        'markdown.extensions.codehilite',
-                        'markdown.extensions.toc'
-                    ])
-    form = CommentsForm()
-    comment_list = post.comment_set.all()
-
-    context = {'post': post,
-               'form': form,
-               'comment_list': comment_list}
-    return render(request, 'blog/detail.html', context)
+# def detail(request, pk):
+#     post = get_object_or_404(Post, pk=pk)
+#     post.increase_views()
+#     # category = post.category.name
+#     post.body = markdown.markdown(post.body,
+#                     extensions=[
+#                         'markdown.extensions.extra',
+#                         'markdown.extensions.codehilite',
+#                         'markdown.extensions.toc'
+#                     ])
+#     form = CommentsForm()
+#     comment_list = post.comment_set.all()
+#
+#     context = {'post': post,
+#                'form': form,
+#                'comment_list': comment_list}
+#     return render(request, 'blog/detail.html', context)
 
 class PostDetailView(DetailView):
     model = Post
