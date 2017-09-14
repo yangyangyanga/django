@@ -21,5 +21,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('blog.urls',namespace='blogapp')),
     url(r'', include('comment.urls')),
-    url(r'^all/rss/$', AllPostsRssFeed(), name='rss')
+    url(r'^all/rss/$', AllPostsRssFeed(), name='rss'),
+    url(r'^search/', include('haystack.urls')),
 ]

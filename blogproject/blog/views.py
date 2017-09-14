@@ -5,6 +5,7 @@ from markdown import Markdown
 from django.views.generic import ListView,DetailView
 from markdown.extensions.toc import TocExtension
 from django.utils.text import slugify
+from django.db.models import Q
 
 from comment.forms import CommentsForm
 
@@ -338,7 +339,18 @@ class TagView(IndexView):
         return super().get_queryset().filter(tags=t)
 
 
+def search(request):
+    # 获取到用户提交的搜索关键词
+    # 用户通过表单get方法提交的数据Django为我们保存在request.GET里，
+    #   这是一个类似于Python字典的对象
+    q = request.GET.get('q')
+    error_msg = ''
+    if not q:
+        error_msg = '请输入关键词'
+        return render(request, 'blog/index.html', {'error_msg': error_msg})
 
+    post_list = Post.objects.filter(Q(title__icontains=q) | Q(body__icontains=q))
+    return render(request, 'blog/index.html', {'error_msg': error_msg, 'post_list': post_list})
 
 
 

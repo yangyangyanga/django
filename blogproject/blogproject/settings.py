@@ -39,7 +39,18 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'blog',
     'comment',
+    'haystack',
 ]
+
+HAYSTACK_CONNECTIONS = {
+    'default': {    # 只需要配置默认的设置
+        'ENGINE': 'blog.whoosh_cn_backend.WhooshEngine',    # 指定了django haystack使用的搜索引擎
+        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),     # 指定了索引文件（搜索引擎需要建立索引文件）需要存放的位置
+    },
+}
+
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 1   # 指定如何对搜索结果分页，这里设置为每1项结果为一页
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'  # 指定什么时候更新索引，
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
