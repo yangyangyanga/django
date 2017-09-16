@@ -23,4 +23,7 @@ urlpatterns = [
     url(r'', include('comment.urls')),
     url(r'^all/rss/$', AllPostsRssFeed(), name='rss'),
     url(r'^search/', include('haystack.urls')),
+    url(r'^accounts/', include('users.urls')),
+    # 将auth应用中的urls模块包含进来
+    url(r'^accounts/', include('django.contrib.auth.urls'))
 ]

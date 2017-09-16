@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Post, Category, Tag
 import markdown
 from markdown import Markdown
@@ -7,7 +7,9 @@ from markdown.extensions.toc import TocExtension
 from django.utils.text import slugify
 from django.db.models import Q
 
+from django.contrib.auth.models import User
 from comment.forms import CommentsForm
+from .forms import PublishForm
 
 # Create your views here.
 # def index(request):
@@ -23,7 +25,7 @@ class IndexView(ListView):
     model = Post
     template_name = 'blog/index.html'
     context_object_name = 'post_list'
-    paginate_by = 1
+    paginate_by = 2
 
     def get_context_data(self, **kwargs):
         '''
@@ -338,6 +340,14 @@ class TagView(IndexView):
         t = get_object_or_404(Tag, pk=self.kwargs.get('pk'))
         return super().get_queryset().filter(tags=t)
 
+def get_author(request):
+    author = request.user
+    post_list = Post.objects.filter(author=author)
+    return render(request, 'blog/index.html', {'post_list': post_list})
+
+# class AuthorView(IndexView):
+#     def get_queryset(self):
+#         return super().get_queryset().filter(author=User.username)
 
 def search(request):
     # 获取到用户提交的搜索关键词
@@ -352,7 +362,46 @@ def search(request):
     post_list = Post.objects.filter(Q(title__icontains=q) | Q(body__icontains=q))
     return render(request, 'blog/index.html', {'error_msg': error_msg, 'post_list': post_list})
 
+# 发布文章
+def publish_article(request):
+    # post =
+    form1 = PublishForm()
+    if request.method == 'POST':
+        form1 = PublishForm(request.POST)   # 实例化表单对象
+        if form1.is_valid():
+            post1 = form1.save(commit=False)   # 由表单对象得到模型对象
+            post1.author = request.user
+            post1.save()    # 保存新增的属性
+            form1.save_m2m()     #每当使用commit=False保存表单时，将添加一个save_m2m()方法来保存多对多的表单数据
+            post = Post.objects.get(pk=post1.pk) # 获得当前新增的post文章对象
 
+            # 渲染文章body内容
+            post.body = markdown.markdown(post.body,extensions=[
+                'markdown.extensions.extra',
+                'markdown.extensions.codehilite',
+                'markdown.extensions.toc',
+            ])
+            # 传递给detail.html模板的而评论表单
+            form = CommentsForm()
+            comment_list = post.comment_set.all()
+
+            context = {
+                'post': post,
+                'form1': form1,
+                'form': form,
+                'comment_list': comment_list,
+            }
+
+            return render(request, 'blog/detail.html',context=context)
+        else:
+            post_list = Post.objects.all()
+            context = {
+                # 'post': post,
+                'form1': form1,
+                'post_list': post_list,
+            }
+            return redirect(post_list)
+    return render(request, 'blog/publisharticle.html',{'form1':form1})
 
 
 

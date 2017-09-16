@@ -1,5 +1,9 @@
 from django import template
 from django.db.models.aggregates import Count
+from django.contrib.auth.models import User
+from django.http import HttpRequest
+from django.contrib import auth
+
 
 from ..models import Post,Category, Tag
 
@@ -24,10 +28,10 @@ def get_categories():
 def get_tags():
     return Tag.objects.annotate(num_posts=Count('post')).filter(num_posts__gt=0)
 
-
-
-
-
+@register.simple_tag
+def get_authors():
+    # author = 'yangyangyang'
+    return Post.objects.all()
 
 
 

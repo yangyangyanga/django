@@ -48,6 +48,14 @@
                                 <li class="cl-effect-11"><a href="fullwidth.html" data-hover="博客">博客</a></li>
                                 <li class="cl-effect-11"><a href="about.html" data-hover="关于">关于</a></li>
                                 <li class="cl-effect-11"><a href="contact.html" data-hover="联系">联系</a></li>
+                                {% if user.is_authenticated %}
+                                    <li class="cl-effect-11"><a href="{% url 'blog:publisharticle' %}">发贴</a></li>
+                                    <li class="cl-effect-11"><a href="{% url 'blog:author' %}">{{request.user}}</a></li>
+                                    <li class="cl-effect-11"><a href="{% url 'password_change' %}">修改密码</a></li>
+                                    <li class="cl-effect-11"><a href="{% url 'logout' %}" data-hover="Logout">Logout</a></li>
+                                {% else %}
+                                    <li class="cl-effect-11"><a href="{% url 'login' %}" data-hover="Login">Login</a></li>
+                                {% endif %}
                             </ul>
                         </div><!-- /.navbar-collapse -->
                     </nav>
@@ -74,6 +82,22 @@
                 <aside class="col-md-4">
                     {% block toc %}
                     {% endblock %}
+                    <div class="widget widget-recent-posts">
+                        <h3 class="widget-title">我的文档</h3>
+                        {% get_authors as authors_post_list %}
+                        <ul>
+                            {% for post1 in authors_post_list %}
+
+                                <li>
+                                    <a href="{{ post.get_absolute_url }}">{{ post1.title }}</a>
+                                </li>
+
+                            {% empty %}
+                            暂时没有
+                            {% endfor %}
+
+                        </ul>
+                    </div>
                     <div class="widget widget-recent-posts">
                         <h3 class="widget-title">最新文章</h3>
                         {% get_recent_post as recent_post_list %}
